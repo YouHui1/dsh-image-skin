@@ -1,0 +1,7 @@
+packages:
+  - .
+
+# pnpm 11 blocks dependency postinstall scripts by default. esbuild's install
+# script wires up its platform binary, so allow it explicitly.
+allowBuilds:
+  esbuild: true

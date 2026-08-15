@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+lib/
+*.tsbuildinfo
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Packed tarballs (pnpm pack)
+*.tgz

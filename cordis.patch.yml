@@ -1,0 +1,18 @@
+# dsh-image-skin bundle patch
+#
+# The single host row that mounts this plugin. The host half is a no-op (the
+# skin is entirely client-side); the real work lives in `./client`, which the
+# web shell loads because package.json declares `dsh.client`.
+#
+# Installed through the official CLI —
+#
+#   dsh plugin --profile web add dsh-image-skin
+#
+# — the command detects `dsh.bundle.patch` and appends `dsh-image-skin` to
+# `dsh.profile.bundles`, so this patch merges automatically. For a local dev
+# build, instead add the equivalent mount line to the profile's own
+# `cordis.patch.yml` (see README), and never both — double-mounting loads two
+# copies of the skin.
+- insert:
+    - id: image-skin
+      name: 'dsh-image-skin'
