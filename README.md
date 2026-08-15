@@ -7,6 +7,12 @@ background, brand and border colors to the image palette automatically.
 
 > Built with [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
 
+## Screenshots
+
+| Effect | Settings page |
+| --- | --- |
+| ![Skin effect](assets/screenshot.jpg) | ![Skin settings page](assets/settings.jpg) |
+
 ## Features
 
 - **Background image** — pick any image (auto-downscaled to a 1600px JPEG for storage).
@@ -68,6 +74,8 @@ scripts/smoke.mjs           # smoke test (host exports + client bundle contract)
 ```
 
 ## Development
+
+Requires Node.js **≥ 22.13** (pnpm 11's requirement) and pnpm 11.
 
 ```sh
 pnpm install

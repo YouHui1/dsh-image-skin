@@ -6,6 +6,12 @@ DSH web 插件：给 DeepSeek Harness 设置一张背景图，并根据图片的
 
 > 本插件使用 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 生成。
 
+## 截图
+
+| 效果图 | 设置页面 |
+| --- | --- |
+| ![皮肤效果](assets/screenshot.jpg) | ![皮肤设置页](assets/settings.jpg) |
+
 ## 功能
 
 - **背景图**：选择任意图片作为应用背景（自动缩小到 1600px JPEG，存储友好）。
@@ -43,6 +49,8 @@ scripts/smoke.mjs          # 冒烟验证（host 导出 + client bundle 契约�
 ```
 
 ## 开发
+
+需要 Node.js **≥ 22.13**（pnpm 11 的要求）与 pnpm 11。
 
 ```sh
 pnpm install

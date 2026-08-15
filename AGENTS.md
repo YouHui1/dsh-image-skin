@@ -26,6 +26,8 @@ scripts/smoke.mjs          # 冒烟验证（host 导出 + client bundle 契约�
 
 ## 命令
 
+需要 Node.js **≥ 22.13**（pnpm 11.21 依赖 `node:sqlite` 内建模块）与 pnpm 11。
+
 ```sh
 pnpm install
 pnpm build        # node scripts/build.mjs && tsc -p tsconfig.build.json
