@@ -84,6 +84,30 @@ pnpm typecheck    # tsc --noEmit
 pnpm smoke        # smoke test: host exports + client bundle contract (no browser)
 ```
 
+## Compatible DSH versions
+
+DSH checks a bundle's declared `@deepseek-ai/dsh-*` `peerDependencies` against its own
+runtime version before loading it, so check out the tag that matches the DSH you run:
+
+| Tag | DSH runtime | `slots` service comes from |
+| --- | --- | --- |
+| `v1.1.0` | `0.2.0-rc.2` (0.2.x) | `@deepseek-ai/dsh-client-ui-renderer` |
+| `v1.0.0` | `0.1.0-rc.6` (0.1.x) | `@deepseek-ai/dsh-client-runtime` |
+
+```sh
+git checkout v1.1.0    # for dsh 0.2.x
+git checkout v1.0.0    # for dsh 0.1.x
+```
+
+Switching tags needs no rebuild: they differ only in the manifest
+(`peerDependencies`, `dsh.client.inject`, version) and in type-erased sources, so the
+emitted `lib/` bundle is the same. For development, run `pnpm install` after switching —
+`pnpm-lock.yaml` is kept per tag.
+
+If the DSH log says `skipping profile bundle "dsh-image-skin"`, the checked-out tag does
+not match the running runtime: switch tags rather than granting the
+`dsh plugin allow-version` exemption.
+
 ## Install into your web profile
 
 **Local development (link, recommended)**

@@ -59,6 +59,24 @@ pnpm typecheck    # tsc --noEmit
 pnpm smoke        # 冒烟验证：host 导出 + client bundle 契约（无需浏览器）
 ```
 
+## 兼容的 DSH 版本
+
+DSH 在加载 bundle 前，会拿它声明的 `@deepseek-ai/dsh-*` `peerDependencies` 与自身运行时版本比对，所以请切到与你在用的 DSH 对应的 tag：
+
+| Tag | DSH 运行时 | `slots` 服务来自 |
+| --- | --- | --- |
+| `v1.1.0` | `0.2.0-rc.2`（0.2.x） | `@deepseek-ai/dsh-client-ui-renderer` |
+| `v1.0.0` | `0.1.0-rc.6`（0.1.x） | `@deepseek-ai/dsh-client-runtime` |
+
+```sh
+git checkout v1.1.0    # 配 dsh 0.2.x
+git checkout v1.0.0    # 配 dsh 0.1.x
+```
+
+切 tag 不需要重新构建：两个 tag 的差异只在 manifest（`peerDependencies`、`dsh.client.inject`、版本号）和被擦除的类型文件里，产出的 `lib/` bundle 相同。若要继续开发，切换后请跑一次 `pnpm install`——`pnpm-lock.yaml` 是按 tag 各自维护的。
+
+若 DSH 日志出现 `skipping profile bundle "dsh-image-skin"`，说明当前 tag 与运行时不匹配：请换 tag，而不是去授 `dsh plugin allow-version` 豁免。
+
 ## 安装到你的 web profile
 
 **方式一：本地开发（link 源码，推荐）**
