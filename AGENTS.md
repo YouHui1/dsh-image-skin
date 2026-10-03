@@ -6,7 +6,8 @@
 
 `dsh-image-skin` 是 DeepSeek Harness（DSH）的 **web 客户端插件**：设置一张背景图，并按图片配色自动派生一套主题（背景表面、文字、品牌色、边框、按钮、代码块、侧边栏）。**纯客户端**，host 半是空挂载点，不注册任何 host 服务/路由/工具。
 
-- 依赖的 DSH 版本基线：`@deepseek-ai/dsh-*@0.1.0-rc.6`、`@deepseek-ai/cordis@^4.0.1`、`react@^18`（都是 **peerDependencies**，运行时由 DSH web profile 提供，构建时外部化）。
+- 依赖的 DSH 版本基线：`@deepseek-ai/dsh-*@0.2.0-rc.2`、`@deepseek-ai/cordis@^4.0.1`、`react@^18`（都是 **peerDependencies**，运行时由 DSH web profile 提供，构建时外部化）。
+- **两代运行时的差异点**：`slots` 服务在 0.1.x 由 `@deepseek-ai/dsh-client-runtime` 提供，在 0.2.x 由 `@deepseek-ai/dsh-client-ui-renderer` 提供（该 runtime 包在 0.2.x 已不存在）；`@deepseek-ai/dsh-client-ui-slots` 两代都只是纯核心包（无 `dsh.client` 声明，不能作为 `dsh.client.inject` 目标）。插件用到的其余 API（`overrideTokens`/`register`/`setTheme`/`getTheme`、`slots.inject`/`slots.register`、`settings.section` 槽位、全部主题 token 名）两代一致，故适配只需改 manifest（peerDeps + `dsh.client.inject`），源码无需改动。
 
 ## 目录结构
 
@@ -64,6 +65,13 @@ pnpm test         # = pnpm smoke
 ```
 
 `loadState()` 对旧数据/缺字段补默认值（fit=cover、scrim=0、auto=false）。新增字段时**必须**在 `loadState()` 里给默认值，保持向后兼容。
+
+## 版本线与 tag（两代运行时并行）
+
+- `v1.0.0` —— dsh **0.1.x** 运行时线（peerDeps `^0.1.0-rc.6`，`slots` 服务来自 `@deepseek-ai/dsh-client-runtime`）。
+- `v1.1.0` —— dsh **0.2.x** 运行时线（peerDeps `^0.2.0-rc.2`，`slots` 服务来自 `@deepseek-ai/dsh-client-ui-renderer`）。
+- 两条线**互斥**：dsh 的兼容性门拿 `@deepseek-ai/dsh-*` peer 范围去比对**运行时版本**，同一份 manifest 不可能同时满足两代。选运行时就是选 tag。
+- 适配新运行时只需改 manifest（`peerDependencies` + `dsh.client.inject`），源码零改动；但 `devDependencies` 与 peer 同步改动后**必须**跑 `pnpm install` 重生成 `pnpm-lock.yaml`，因为 CI 用的是 `pnpm install --frozen-lockfile`。
 
 ## 发布（当前不发布）
 

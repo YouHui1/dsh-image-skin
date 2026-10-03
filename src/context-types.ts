@@ -50,7 +50,7 @@ export interface SkinSlotRegisterOptions {
   key?: string
 }
 
-/** The client slots registry face (mirror of `@deepseek-ai/dsh-client-runtime`). */
+/** The client slots registry face (mirror of `@deepseek-ai/dsh-client-ui-renderer`). */
 export interface SkinSlotsService {
   /** Contribute one component to a declared slot; returns the disposer. */
   register(options: SkinSlotRegisterOptions, component: unknown): () => void
