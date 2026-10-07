@@ -75,6 +75,10 @@ git checkout v1.0.0    # 配 dsh 0.1.x
 
 切 tag 不需要重新构建：两个 tag 的差异只在 manifest（`peerDependencies`、`dsh.client.inject`、版本号）和被擦除的类型文件里，产出的 `lib/` bundle 相同。若要继续开发，切换后请跑一次 `pnpm install`——`pnpm-lock.yaml` 是按 tag 各自维护的。
 
+上面这套 `git checkout` 只适用于**本地 clone + `link:` 挂载**。`dsh plugin` 没有"原地切换版本"这回事：它把参数原样转发给 pnpm，所以换版本就是换依赖 spec（在 profile 里 `pnpm add <spec>`，或 `remove` + `add`）。重启后加载新副本；git spec 的兼容性检查发生在 pnpm 跑完之后，不兼容的 tag 会被拒绝并回滚（见下）。
+
+> `github:` 安装会自己构建：`package.json` 声明了 `prepare: pnpm build`，pnpm 会在抓取 git 依赖后运行 `prepare`。但 pnpm 11 默认拦截该脚本，所以第一次尝试会**故意失败**并打印需要放行的确切键（见下面"从 GitHub 安装"）。开发请走 `link:`。
+
 若 DSH 日志出现 `skipping profile bundle "dsh-image-skin"`，说明当前 tag 与运行时不匹配：请换 tag，而不是去授 `dsh plugin allow-version` 豁免。
 
 ## 安装到你的 web profile
@@ -90,6 +94,20 @@ dsh plugin --profile web add link:<本仓库的绝对路径>
 ```
 
 然后重启 DSH、浏览器**硬刷新**（Ctrl/Cmd+Shift+R）。`dsh plugin` 检测到 `dsh.bundle.patch` 会自动把插件追加进 `dsh.profile.bundles`。
+
+**方式二：从 GitHub 装某个 tag（不需要本地 clone）**
+
+```sh
+# 1. 第一次会失败，并打印它需要的那个 allowBuilds 键
+dsh plugin --profile web add github:YouHui1/dsh-image-skin#v1.1.0
+
+# 2. 把打印出来的键贴进 ~/.dsh/profiles/web/pnpm-workspace.yaml，再重试
+#    allowBuilds:
+#      'dsh-image-skin@github:YouHui1/dsh-image-skin#<sha>': true
+dsh plugin --profile web add github:YouHui1/dsh-image-skin#v1.1.0
+```
+
+键必须与 pnpm 打印的**完全一致（含 commit SHA）**：pnpm 会把 tag 解析成 commit，写成仓库级的 `github:YouHui1/dsh-image-skin` 是匹配不上的（实测被拒）。换 tag、或 tag 被移动，SHA 就变了，pnpm 会打印新键，需要重做第 1 步。`prepare` 跑的是 `pnpm build`，所以执行安装的机器需要 Node ≥ 22.13 并能访问注册表拉取 devDependencies。
 
 本项目不发布到 npm（`package.json` 已设 `"private": true`），个人使用走方式一即可；如日后要公开发布，见 `AGENTS.md`。
 

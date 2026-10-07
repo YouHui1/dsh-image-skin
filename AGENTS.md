@@ -78,6 +78,10 @@ pnpm test         # = pnpm smoke
 - 当前 `package.json` 已设 `"private": true`，不发布 npm；个人使用走 `dsh plugin --profile web add link:<绝对路径>` 即可自动挂载。
 - 若将来要发 npm：先删掉 `private`，再**改 scoped 名**避免全局抢名，并**绝不要用 `@deepseek-ai` scope**（那是官方组织）。改 `package.json.name`（+ `publishConfig.access: public`）、`cordis.patch.yml` 的 `name`、`scripts/build.mjs` 的 `PACKAGE_ID`、`src/client/index.tsx` 的 `SOURCE` / `AUTO_THEME_ID`，以及 README 里的包名。
 - 许可：MIT；非官方隶属，不要在署名上冒充 DeepSeek。
+- **从 GitHub 安装（`dsh plugin --profile web add github:YouHui1/dsh-image-skin#<tag>`）已实测可用**，但有一个必须先做的放行步骤：`lib/` 被 `.gitignore` 排除，所以 `package.json` 用 `"prepare": "pnpm build"` 让 pnpm 在抓取 git 依赖后构建。pnpm 11 默认拦截生命周期脚本，首次 `add` 会以 `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` 失败并打印**确切的 `allowBuilds` 键**，把它贴进 profile 的 `pnpm-workspace.yaml` 再重试即可（实测放行后 `prepare` 跑通 `pnpm install` + `pnpm build`，装出的副本含 `lib/index.js`、`lib/client.js`、`lib/types/`）。
+  - 键必须**逐字含 commit SHA**：`dsh-image-skin@github:YouHui1/dsh-image-skin#<sha>: true`。仓库级键（如 `github:YouHui1/dsh-image-skin` 或 `git+file:///...`）实测**匹配不上**；换 tag / tag 被移动 → SHA 变化 → 需重新放行。
+  - 这条通道要求安装机有 Node ≥ 22.13 且能访问注册表（`prepare` 里的 `pnpm install` 要拉 devDependencies）。
+- 版本切换只有"换依赖 spec"这一条路：`dsh plugin` 是 pnpm 转发器，**没有原地升级**。跨运行时线换 tag（0.1.x ↔ 0.2.x）会被兼容性门判为 `incompatible-version` 并回滚 `package.json`/`pnpm-lock.yaml`，只能换 tag 而不是授 `allow-version` 豁免。
 
 ## 构建产物契约（冒烟脚本的校验点）
 

@@ -61,6 +61,7 @@
     "typecheck": "tsc --noEmit",
     "smoke": "node scripts/smoke.mjs",
     "test": "node scripts/smoke.mjs",
+    "prepare": "pnpm build",
     "prepublishOnly": "pnpm build"
   },
   "license": "MIT",

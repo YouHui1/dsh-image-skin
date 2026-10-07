@@ -104,6 +104,18 @@ Switching tags needs no rebuild: they differ only in the manifest
 emitted `lib/` bundle is the same. For development, run `pnpm install` after switching —
 `pnpm-lock.yaml` is kept per tag.
 
+These `git checkout` steps apply to a **local clone mounted with `link:`**. There is no
+in-place "switch version" in `dsh plugin`: it forwards its arguments to pnpm, so changing
+the installed version means changing the dependency spec (`pnpm add <spec>` inside the
+profile, or `remove` + `add`). The profile then restarts on the new copy; a git spec is
+compatibility-checked only after pnpm runs, and an incompatible tag is rejected and rolled
+back (see below).
+
+> A `github:` install builds itself: `package.json` declares `prepare: pnpm build`, and
+> pnpm runs `prepare` on a fetched git dependency. pnpm 11 blocks that script until the
+> package is allowlisted, so the first attempt fails on purpose and prints the exact key
+> to add (see "Install from GitHub" below). Use the `link:` flow for development.
+
 If the DSH log says `skipping profile bundle "dsh-image-skin"`, the checked-out tag does
 not match the running runtime: switch tags rather than granting the
 `dsh plugin allow-version` exemption.
@@ -123,6 +135,24 @@ dsh plugin --profile web add link:<absolute path to this repo>
 Then restart DSH and hard-refresh the browser (Ctrl/Cmd+Shift+R). `dsh plugin`
 detects `dsh.bundle.patch` and appends the package to `dsh.profile.bundles`
 automatically.
+
+**GitHub tag (no local clone)**
+
+```sh
+# 1. first attempt fails and prints the exact allowBuilds key it needs
+dsh plugin --profile web add github:YouHui1/dsh-image-skin#v1.1.0
+
+# 2. paste that key into ~/.dsh/profiles/web/pnpm-workspace.yaml, then retry
+#    allowBuilds:
+#      'dsh-image-skin@github:YouHui1/dsh-image-skin#<sha>': true
+dsh plugin --profile web add github:YouHui1/dsh-image-skin#v1.1.0
+```
+
+The key must match what pnpm printed, **including the commit SHA**: pnpm resolves the tag
+to a commit, and a repo-level key such as `github:YouHui1/dsh-image-skin` does not match.
+A different tag, or a moved tag, means a different SHA, pnpm prints a new key, and step 1
+is repeated. `prepare` itself runs `pnpm build`, so the machine doing the install needs
+Node ≥ 22.13 and registry access for the devDependencies.
 
 This repo is not published to npm (`package.json` has `"private": true`) — local
 use just needs the link flow above. See `AGENTS.md` if you ever want to publish.
